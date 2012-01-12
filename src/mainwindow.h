@@ -26,6 +26,11 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QDialog>
+#include <QLineEdit>
+#include <QVBoxLayout>
+#include <QDialogButtonBox>
+#include <QDebug>
 
 class HostInfoManager;
 class Monitor;
@@ -33,6 +38,48 @@ class StatusView;
 class QActionGroup;
 class QMenu;
 class QCloseEvent;
+
+class ConfigureNetworkNameDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    ConfigureNetworkNameDialog(QWidget * parent = 0)
+        : QDialog(parent, Qt::Dialog)
+    {
+        QVBoxLayout* layout = new QVBoxLayout;
+
+        m_networkName = new QLineEdit;
+        layout->addWidget(m_networkName);
+
+        QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal);
+        layout->addWidget(buttonBox);
+        connect(buttonBox, SIGNAL(rejected()), this, SLOT(close()));
+        connect(buttonBox, SIGNAL(accepted()), this, SLOT(setNetworkName()));
+
+        setLayout(layout);
+    }
+
+    ~ConfigureNetworkNameDialog() {}
+
+signals:
+    void networkNameChanged(QString);
+
+private slots:
+    void setNetworkName()
+    {
+        qDebug() << "aaa";
+        const QString networkName = m_networkName->text();
+        if (networkName.isEmpty()) {
+            emit rejected();
+        } else {
+            emit networkNameChanged(networkName);
+            accept();
+        }
+    }
+
+private:
+    QLineEdit* m_networkName;
+};
 
 class MainWindow : public QMainWindow
 {
@@ -83,6 +130,8 @@ private:
     QAction* m_systrayAction;
     QSystemTrayIcon* m_systemTrayIcon;
     QMenu* m_systemTrayMenu;
+//    QByteArray m_netname;
+    ConfigureNetworkNameDialog* m_networkNameDialog;
 };
 
 #endif // MAINWINDOW_H

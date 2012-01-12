@@ -30,6 +30,7 @@
 #include <QMenuBar>
 #include <QSettings>
 #include <QVBoxLayout>
+#include <QLineEdit>
 #include "detailedhostview.h"
 #include "hostinfo.h"
 #include "listview.h"
@@ -46,9 +47,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     m_viewMode = new QActionGroup(this);
 
+    m_networkNameDialog = new ConfigureNetworkNameDialog(this);
+    connect(m_networkNameDialog, SIGNAL(networkNameChanged(QString)),
+            m_monitor, SLOT(setCurrentNet(QByteArray)));
+
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
     QAction* quitAction = fileMenu->addAction(tr("&Quit"));
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    QAction *setNetworkName = fileMenu->addAction(tr("&Set Network Name"));
+    connect(setNetworkName, SIGNAL(triggered()), m_networkNameDialog, SLOT(exec()));
 
     QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
     QMenu* modeMenu = viewMenu->addMenu(tr("&Mode"));

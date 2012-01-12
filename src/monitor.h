@@ -26,6 +26,7 @@
 #include "job.h"
 
 #include <QtCore/QSocketNotifier>
+#include <QDebug>
 
 class HostInfoManager;
 class Msg;
@@ -42,11 +43,17 @@ public:
     Monitor(HostInfoManager*, QObject* parent);
     ~Monitor();
 
-    void setCurrentNet(const QByteArray& name) { m_currentNetName = name; }
     QByteArray currentNet() const { return m_currentNetName; }
 
     void setCurrentView(StatusView*, bool rememberJobs);
     void checkScheduler(bool deleteit = false);
+
+public slots:
+    void setCurrentNet(const QByteArray& name) {
+        qDebug() << name;
+        m_currentNetName = name;
+        slotCheckScheduler();
+    }
 
 protected:
     void setSchedulerState(bool);
